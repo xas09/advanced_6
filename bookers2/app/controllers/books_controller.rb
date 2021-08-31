@@ -1,31 +1,27 @@
 class BooksController < ApplicationController
   before_action :ensure_user, only: [:edit, :update, :destroy]
 
-  def new
-    @books = Book.new
-  end
-
   def create
-    @books = Book.new(book_params)
-    @book = Book.all
-    @books.user_id = current_user.id
+    @book = Book.new(book_params)
+    @books = Book.all
+    @book.user_id = current_user.id
     @user = current_user
-    if @books.save
+    if @book.save
     flash[:notice] = "successfully created"
-    redirect_to book_path(@books)
+    redirect_to book_path(@book)
     else
       render :index
     end
   end
 
   def index
-    @books = Book.new
-    @book = Book.all
+    @book = Book.new
+    @books = Book.all
     @user = current_user
   end
 
   def show
-    @books = Book.new
+    @newbook = Book.new
     @book = Book.find(params[:id])
     @users = @book.user
     @book_comment = BookComment.new
@@ -54,9 +50,10 @@ class BooksController < ApplicationController
   private
 
   def ensure_user
-    @books = current_user.books
-    @book = @books.find_by(id: params[:id])
-    redirect_to books_path unless @book
+    @book = Book.find(params[:id])
+    unless @book.user == current_user
+    redirect_to books_path
+    end
   end
   
   def book_params
